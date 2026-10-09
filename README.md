@@ -227,7 +227,7 @@ de [`notebooks/catalogo.py`](notebooks/catalogo.py) – a mesma fonte usada pelo
 | Campo | Descrição | Tipo | Domínio de valores | Linhagem |
 |---|---|---|---|---|
 | `data_referencia` | [Bruto, texto] Data de referência da observação (último dia do mês) | STRING | Último dia de cada mês entre 2020-01-31 e 2025-12-31 (72 meses) | Arquivo de origem: meta_atuarial.csv (gerado por scripts/01_baixar_dados_bcb.py: IPCA real + spread de 5,0% a.a.), coluna data_referencia |
-| `meta_atuarial` | [Bruto, texto] Meta atuarial mensal = (1+IPCA)*(1+spread)^(1/12)-1, com spread real de 5,0% a.a. (premissa), em % ao mês | STRING | Entre 0 e 5 % a.m. | Arquivo de origem: meta_atuarial.csv (gerado por scripts/01_baixar_dados_bcb.py: IPCA real + spread de 5,0% a.a.), coluna meta_atuarial |
+| `meta_atuarial` | [Bruto, texto] Meta atuarial mensal = (1+IPCA)*(1+spread)^(1/12)-1, com spread real de 5,0% a.a. (premissa), em % ao mês | STRING | Entre -2 e 5 % a.m. (pode ser levemente negativa em mês de deflação forte) | Arquivo de origem: meta_atuarial.csv (gerado por scripts/01_baixar_dados_bcb.py: IPCA real + spread de 5,0% a.a.), coluna meta_atuarial |
 | `_source_file` | Caminho do arquivo de origem no Volume (rastreabilidade) | STRING | Caminho em /Volumes/... | Gerado na ingestão (01_bronze_ingestion.py) |
 | `_ingestion_ts` | Data/hora da ingestão na camada Bronze | TIMESTAMP | Timestamp UTC da carga | Gerado na ingestão (01_bronze_ingestion.py) |
 
@@ -301,7 +301,7 @@ de [`notebooks/catalogo.py`](notebooks/catalogo.py) – a mesma fonte usada pelo
 | Campo | Descrição | Tipo | Domínio de valores | Linhagem |
 |---|---|---|---|---|
 | `data_referencia` | Data de referência da observação (último dia do mês) | DATE | Último dia de cada mês entre 2020-01-31 e 2025-12-31 (72 meses) | bronze.meta_atuarial.data_referencia |
-| `meta_atuarial` | Meta atuarial mensal = (1+IPCA)*(1+spread)^(1/12)-1, com spread real de 5,0% a.a. (premissa), em % ao mês | DOUBLE | Entre 0 e 5 % a.m. | bronze.meta_atuarial.meta_atuarial |
+| `meta_atuarial` | Meta atuarial mensal = (1+IPCA)*(1+spread)^(1/12)-1, com spread real de 5,0% a.a. (premissa), em % ao mês | DOUBLE | Entre -2 e 5 % a.m. (pode ser levemente negativa em mês de deflação forte) | bronze.meta_atuarial.meta_atuarial |
 | `_processed_ts` | Data/hora do processamento na camada Silver | TIMESTAMP | Timestamp UTC do processamento | Gerado no processamento (02_silver_processing.py) |
 
 #### `silver.dq_checks`
@@ -384,7 +384,7 @@ de [`notebooks/catalogo.py`](notebooks/catalogo.py) – a mesma fonte usada pelo
 | `ibovespa_var_pct` | Variação percentual do Ibovespa em relação ao mês anterior | DOUBLE | Entre -50 e +50 % | silver.mercado.ibovespa_var_pct |
 | `dolar_var_pct` | Variação percentual do dólar em relação ao mês anterior | DOUBLE | Entre -50 e +50 % | silver.mercado.dolar_var_pct |
 | `selic_var_pp` | Variação da Meta Selic em relação ao mês anterior, em pontos percentuais | DOUBLE | Entre -5 e +5 p.p.; 0 = sem mudança | silver.mercado.selic_var_pp |
-| `meta_atuarial` | Meta atuarial mensal = (1+IPCA)*(1+spread)^(1/12)-1, com spread real de 5,0% a.a. (premissa), em % ao mês | DOUBLE | Entre 0 e 5 % a.m. | silver.meta_atuarial.meta_atuarial (JOIN por data_referencia) |
+| `meta_atuarial` | Meta atuarial mensal = (1+IPCA)*(1+spread)^(1/12)-1, com spread real de 5,0% a.a. (premissa), em % ao mês | DOUBLE | Entre -2 e 5 % a.m. (pode ser levemente negativa em mês de deflação forte) | silver.meta_atuarial.meta_atuarial (JOIN por data_referencia) |
 
 #### `gold.analitico_carteira_mensal`
 
@@ -400,7 +400,7 @@ de [`notebooks/catalogo.py`](notebooks/catalogo.py) – a mesma fonte usada pelo
 | `valor_total` | Soma da posição de todos os fundos no mês, em R$ | DOUBLE | Maior que 0 | SUM(gold.fato_performance.valor_aplicado) por mês |
 | `resultado_total` | Soma do resultado financeiro de todos os fundos no mês, em R$ | DOUBLE | Qualquer valor real | SUM(gold.fato_performance.resultado_financeiro) por mês |
 | `retorno_carteira_pct` | Retorno mensal da carteira = resultado_total / valor_total x 100 (média ponderada pela posição), em % | DOUBLE | Tipicamente entre -30 e +30 % a.m. | Calculado: resultado_total / valor_total x 100 |
-| `meta_atuarial` | Meta atuarial mensal = (1+IPCA)*(1+spread)^(1/12)-1, com spread real de 5,0% a.a. (premissa), em % ao mês | DOUBLE | Entre 0 e 5 % a.m. | gold.fato_mercado.meta_atuarial |
+| `meta_atuarial` | Meta atuarial mensal = (1+IPCA)*(1+spread)^(1/12)-1, com spread real de 5,0% a.a. (premissa), em % ao mês | DOUBLE | Entre -2 e 5 % a.m. (pode ser levemente negativa em mês de deflação forte) | gold.fato_mercado.meta_atuarial |
 | `excesso_sobre_meta_pp` | Retorno da carteira menos a meta atuarial do mês, em pontos percentuais | DOUBLE | Positivo = superou a meta | Calculado: retorno_carteira_pct - meta_atuarial |
 | `atingiu_meta` | Indica se o retorno da carteira foi maior ou igual à meta atuarial no mês | BOOLEAN | true / false | Calculado: retorno_carteira_pct >= meta_atuarial |
 | `selic` | Meta Selic vigente no fim do mês, em % ao ano | DOUBLE | Entre 0 e 50 % a.a. | gold.fato_mercado.selic |
@@ -503,6 +503,12 @@ que detectar. **Isso é declarado aqui por transparência.** O mercado vem do Ba
 
 **Balanço esperado da carteira:** 870 linhas na Bronze − 6 duplicatas − 7 rejeitadas = **857 linhas na Silver**
 (7 de 864 fundo-mês ≈ 0,8% fora da análise; efeito desprezível sobre os retornos agregados).
+
+**Achado real na meta atuarial (regra corrigida):** a primeira versão da regra de acurácia exigia `meta_atuarial` entre 0 e 5% a.m.
+A verificação da Bronze sinalizou meses fora dessa faixa. A causa não era erro de dado: em mês de deflação forte do IPCA
+(por exemplo, IPCA abaixo de cerca de −0,4% a.m.), a meta `(1+IPCA)×(1+5%)^(1/12)−1` fica levemente negativa. A regra estava
+errada, não o dado; o piso foi ajustado para −2% a.m. (nos notebooks 02 e 04), e o mês foi mantido na análise.
+⚠️ **PREENCHER:** confirme no seu screenshot a quantidade de meses sinalizados antes do ajuste e cite-a aqui.
 
 **Outliers:** por classe de ativo, parte dos retornos mensais foge do intervalo do IQR (especialmente renda variável e exterior,
 mais voláteis). São variações plausíveis e **foram mantidas** (apenas sinalizadas); só valores impossíveis foram rejeitados.
