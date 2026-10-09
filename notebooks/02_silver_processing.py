@@ -146,8 +146,9 @@ meta_tipada = bt.select(
 )
 regras_meta = [
     (F.col("data_referencia").isNull(), "data_referencia inválida ou ausente"),
-    (F.col("meta_atuarial").isNull() | (F.col("meta_atuarial") < 0) | (F.col("meta_atuarial") > 5),
-     "meta_atuarial ausente ou fora de [0; 5]"),
+    # a meta pode ser levemente negativa em mês de deflação forte (IPCA abaixo de ~ -0,4%), por isso o piso é -2
+    (F.col("meta_atuarial").isNull() | (F.col("meta_atuarial") < -2) | (F.col("meta_atuarial") > 5),
+     "meta_atuarial ausente ou fora de [-2; 5]"),
 ]
 m_meta = processar("meta_atuarial", meta_tipada, ["data_referencia"], regras_meta, False)
 

@@ -47,7 +47,7 @@ ESPEC = {
     "meta_atuarial": dict(
         chave=["data_referencia"],
         datas=["data_referencia"],
-        numericas={"meta_atuarial": (0, 5)},
+        numericas={"meta_atuarial": (-2, 5)},
     ),
 }
 

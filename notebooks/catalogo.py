@@ -37,7 +37,7 @@ COL = {
     "selic_var_pp": ("Variação da Meta Selic em relação ao mês anterior, em pontos percentuais", "DOUBLE",
                      "Entre -5 e +5 p.p.; 0 = sem mudança"),
     "meta_atuarial": ("Meta atuarial mensal = (1+IPCA)*(1+spread)^(1/12)-1, com spread real de 5,0% a.a. (premissa), em % ao mês",
-                      "DOUBLE", "Entre 0 e 5 % a.m."),
+                      "DOUBLE", "Entre -2 e 5 % a.m. (pode ser levemente negativa em mês de deflação forte)"),
 }
 
 EXTRA = {
@@ -82,7 +82,7 @@ EXTRA = {
 
 L_CART = "carteira.csv (gerado por scripts/02_gerar_carteira_sintetica.py)"
 L_MERC = ("mercado.csv (gerado por scripts/01_baixar_dados_bcb.py a partir das séries SGS do Banco Central: "
-          "432 Selic meta, 12 CDI, 433 IPCA, 1 dólar, 7 Ibovespa)")
+          "432 Selic meta, 12 CDI, 433 IPCA, 1 dólar; e do fechamento do Ibovespa (^BVSP) obtido do Yahoo Finance)")
 L_META = "meta_atuarial.csv (gerado por scripts/01_baixar_dados_bcb.py: IPCA real + spread de 5,0% a.a.)"
 
 _MERC_COLS = ["data_referencia", "selic", "cdi", "ipca", "ibovespa", "dolar",
