@@ -1,12 +1,10 @@
 # MVP – Pipeline de Dados na Nuvem para Monitoramento da Meta Atuarial de um RPPS
 
 **Disciplina:** Engenharia de Dados – MVP (PUC-Rio)
-**Aluno(a):** ⚠️ PREENCHER (nome completo)
+**Aluno(a):** Max Gian Martins dos Santos
 **Plataforma:** Databricks Free Edition (Unity Catalog, Volumes, Delta Lake, Spark SQL/PySpark)
-**Repositório:** ⚠️ PREENCHER (link público do GitHub)
+**Repositório:** [https://github.com/maxgianms-web/mvp-meta-atuarial](https://github.com/maxgianms-web/mvp-meta-atuarial)
 
-> **Legenda:** trechos marcados com ⚠️ **PREENCHER** dependem da execução no *seu* Databricks (screenshots e números) e
-> não podem ser escritos antes. Apague esta legenda e todos os avisos antes de entregar.
 
 ## Sumário
 1. [Contexto de Negócio e Perguntas (Etapa 2 e 4.1)](#1-contexto-de-negócio-e-perguntas-etapa-2-e-41)
@@ -67,12 +65,10 @@ A descrição campo a campo (tipo, domínio, linhagem) está no catálogo da se�
 
 ### 1.5 Licença e uso dos dados
 * **Dados do Banco Central (SGS):** dados abertos do BCB. O portal de dados abertos do Banco Central indica a licença
-  *Open Data Commons Open Database License (ODbL) v1.0*. ⚠️ **PREENCHER/CONFERIR:** abra a página de dados abertos de uma das
-  séries, confirme a licença e cole aqui o link. O IPCA é produzido pelo IBGE e o Ibovespa é um índice da B3; ambos são
+  *Open Data Commons Open Database License (ODbL) v1.0*. Fonte: [Taxa de juros - Meta Selic definida pelo Copom](https://dadosabertos.bcb.gov.br/dataset/432-taxa-de-juros---meta-selic-definida-pelo-copom). O IPCA é produzido pelo IBGE e o Ibovespa é um índice da B3; ambos são
   usados aqui apenas para fins acadêmicos.
-* **Ibovespa (Yahoo Finance):** os fechamentos foram obtidos pela biblioteca de código aberto `yfinance`, para uso pessoal e acadêmico.
-  ⚠️ **PREENCHER/CONFERIR:** leia os termos de uso do Yahoo Finance e cite o link aqui, registrando que o uso é exclusivamente acadêmico
-  e que o Ibovespa é propriedade da B3 (a B3 também publica a série histórica oficial em sua página de estatísticas históricas do índice).
+* **Ibovespa (Yahoo Finance):** os fechamentos foram obtidos pela biblioteca de código aberto `yfinance`, para uso pessoal e acadêmico. Fonte: [Yahoo Terms of Service](https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html). O uso é **exclusivamente** acadêmico
+  e o Ibovespa é propriedade da B3 (a B3 também publica a série histórica oficial em sua página de estatísticas históricas do índice).
 * **Carteira de fundos:** dados fictícios gerados pelo autor; não há restrição de licença. Não representam nenhum RPPS real.
 
 ### 1.6 Premissa metodológica importante
@@ -97,13 +93,24 @@ a *metodologia* e a *engenharia* do pipeline, não descobertas sobre fundos reai
 **Scripts de coleta no GitHub:** [`scripts/01_baixar_dados_bcb.py`](scripts/01_baixar_dados_bcb.py) e
 [`scripts/02_gerar_carteira_sintetica.py`](scripts/02_gerar_carteira_sintetica.py).
 O script 01 valida os valores baixados (faixas plausíveis por indicador) antes de gravar os CSVs. A série 7 do SGS (Ibovespa) foi testada e
-descartada porque só traz dados até 2019; por isso o índice vem do Yahoo Finance (registre isso na autoavaliação, como dificuldade real).
+descartada porque só traz dados até 2019; por isso o índice vem do Yahoo Finance.
 
 **Evidências (screenshots):**
-> ⚠️ **PREENCHER** com imagens em `docs/img/`:
-> 1. Saída do script `01_baixar_dados_bcb.py` no terminal (período e primeiras/últimas linhas);
-> 2. Volume `raw_files` com os 3 arquivos enviados;
-> 3. Saída do notebook `01_bronze_ingestion` (contagem de linhas por tabela).
+
+*Coleta dos dados (scripts executados localmente):*
+
+![Saída do script 01 – indicadores do Banco Central e Ibovespa](docs/img/01_terminal_script_bcb.png)
+![Saída do script 02 – carteira sintética e anomalias injetadas](docs/img/02_terminal_script_carteira.png)
+
+*Ambiente no Databricks e upload dos CSVs:*
+
+![Tela inicial do Databricks Free Edition](docs/img/03_databricks_inicio.png)
+![Saída do notebook 00_setup – schemas criados e caminho do Volume](docs/img/04_setup.png)
+![Volume raw_files com os 3 arquivos enviados](docs/img/05_volume_arquivos.png)
+
+*Ingestão na camada Bronze:*
+
+![Saída do notebook 01 – linhas e colunas por tabela Bronze](docs/img/06_bronze_resumo.png)
 
 ---
 
@@ -170,11 +177,24 @@ O catálogo abaixo descreve **todas as tabelas e colunas** (descrição, tipo, d
 de [`notebooks/catalogo.py`](notebooks/catalogo.py) – a mesma fonte usada pelo notebook `05_data_catalog.py` para gravar os
 `COMMENT` no **Unity Catalog** – e também está em [`docs/catalogo_dados.md`](docs/catalogo_dados.md).
 
-> ⚠️ **PREENCHER** – screenshots do sistema de catálogo (Unity Catalog), em `docs/img/`:
-> 1. Catalog Explorer mostrando as tabelas dos 3 schemas;
-> 2. Aba *Overview* de uma tabela Gold com descrição e comentários das colunas;
-> 3. Aba *Lineage* de `gold.analitico_carteira_mensal` (grafo de linhagem);
-> 4. Resultado da consulta em `information_schema.columns` (última célula do notebook `05`).
+*Evidências do catálogo no Unity Catalog (Catalog Explorer):*
+
+![Schema bronze: 3 tabelas](docs/img/15a_catalogo_tabelas.png)
+![Schema silver: 5 tabelas, com descrição](docs/img/15b_catalogo_tabelas.png)
+![Schema gold: 6 tabelas, com descrição](docs/img/15c_catalogo_tabelas.png)
+
+*Aba Overview de uma tabela Gold, com a descrição da tabela e os comentários de cada coluna:*
+
+![Overview de gold.analitico_carteira_mensal](docs/img/16_catalogo_overview.png)
+
+*Aba Lineage de `gold.analitico_carteira_mensal` (de quais tabelas e notebooks ela vem):*
+
+![Linhagem de gold.analitico_carteira_mensal](docs/img/17_catalogo_linhagem.png)
+
+*Resultado da consulta em `information_schema.columns` (notebook `05`), com a mensagem de consistência do catálogo:*
+
+![Catálogo consultável no information_schema](docs/img/14_catalogo_notebook.png)
+
 
 ### Camada Bronze (dado bruto)
 
@@ -472,10 +492,20 @@ tabelas analíticas (retorno ponderado, excesso sobre a meta, cenário econômic
 integridade referencial (fatos sem dimensão, duplicatas por fundo/mês).
 
 ### 4.3 Evidências de persistência
-> ⚠️ **PREENCHER** – screenshots em `docs/img/`:
-> 1. Saída do `02_silver_processing` (tabela-resumo: linhas de entrada, duplicatas removidas, rejeitados, linhas de saída);
-> 2. Saída do `03_gold_model` (verificações de integridade e amostras das tabelas Gold);
-> 3. Catalog Explorer mostrando as tabelas **persistidas** nos schemas `bronze`, `silver` e `gold`.
+
+*Camada Silver – resumo do processamento (linhas de entrada, duplicatas removidas, rejeitados e linhas de saída):*
+
+![Resumo do notebook 02 – Silver](docs/img/08_silver_resumo.png)
+
+*Camada Gold – verificações de integridade do modelo (todas com 0 violações):*
+
+![Verificações de integridade – Gold](docs/img/10_gold_integridade.png)
+
+*Camada Gold – tabelas persistidas, com contagem de linhas e amostra (dim_tempo, dim_fundo, fato_performance, fato_mercado, analitico_classe_mensal e analitico_carteira_mensal):*
+
+![Amostras Gold 1/3](docs/img/11a_gold_amostras.png)
+![Amostras Gold 2/3](docs/img/11b_gold_amostras.png)
+![Amostras Gold 3/3](docs/img/11c_gold_amostras.png)
 
 ---
 
@@ -489,7 +519,7 @@ por classe de ativo ou por fundo). Os resultados são gravados em `silver.dq_che
 
 ### 5.2 Problemas injetados deliberadamente e tratamento
 Como a carteira é sintética, o gerador injeta (com semente fixa) problemas de qualidade conhecidos para que a etapa tenha o
-que detectar. **Isso é declarado aqui por transparência.** O mercado vem do Banco Central e não recebe nenhuma injeção.
+que detectar. **Isso é declarado aqui por transparência.** Os dados de mercado vêm de fontes reais (Banco Central e Yahoo Finance) e não recebem nenhuma injeção.
 
 | Problema | Qtd. injetada | Dimensão | Tratamento na Silver | Impacto |
 |---|---|---|---|---|
@@ -497,7 +527,7 @@ que detectar. **Isso é declarado aqui por transparência.** O mercado vem do Ba
 | `rentabilidade_pct` nula | 3 | Completude | Rejeitado → `silver.carteira_rejeitados` | 3 fundo-mês fora da análise |
 | `gestor` nulo | 3 | Completude | `Não informado`; a `dim_fundo` usa a gestora informada nos outros meses | Registros mantidos |
 | `classe_ativo` com grafia diferente (minúscula, maiúscula, espaços, sem acento) | 4 | Consistência | `trim` + mapeamento canônico | Registros mantidos |
-| `rentabilidade_pct` com erro de escala (120% e −85% ao mês) | 2 | Acurácia | Rejeitado (|x| > 50% a.m.) | 2 fundo-mês fora da análise |
+| `rentabilidade_pct` com erro de escala (120% e −85% ao mês) | 2 | Acurácia | Rejeitado (valor absoluto acima de 50% a.m.) | 2 fundo-mês fora da análise |
 | `valor_aplicado` negativo | 2 | Acurácia | Rejeitado | 2 fundo-mês fora da análise |
 | Linhas duplicadas | 6 | Unicidade | Removidas | Evita dupla contagem |
 
@@ -505,106 +535,163 @@ que detectar. **Isso é declarado aqui por transparência.** O mercado vem do Ba
 (7 de 864 fundo-mês ≈ 0,8% fora da análise; efeito desprezível sobre os retornos agregados).
 
 **Achado real na meta atuarial (regra corrigida):** a primeira versão da regra de acurácia exigia `meta_atuarial` entre 0 e 5% a.m.
-A verificação da Bronze sinalizou meses fora dessa faixa. A causa não era erro de dado: em mês de deflação forte do IPCA
-(por exemplo, IPCA abaixo de cerca de −0,4% a.m.), a meta `(1+IPCA)×(1+5%)^(1/12)−1` fica levemente negativa. A regra estava
-errada, não o dado; o piso foi ajustado para −2% a.m. (nos notebooks 02 e 04), e o mês foi mantido na análise.
-⚠️ **PREENCHER:** confirme no seu screenshot a quantidade de meses sinalizados antes do ajuste e cite-a aqui.
+Na primeira execução, a verificação da Bronze sinalizou 1 mês: julho de 2022, com IPCA de −0,68% e meta atuarial de −0,2754% a.m.
+A causa não era erro de dado: em mês de deflação forte do IPCA, a meta `(1+IPCA)×(1+5%)^(1/12)−1` pode ficar negativa. A regra estava
+mal calibrada, não o dado; o piso foi ajustado para −2% a.m. (nos notebooks 02 e 04) e a Silver manteve os 72 meses.
+
+![Achado da meta atuarial](docs/img/23_achado_meta_negativa.png)
 
 **Outliers:** por classe de ativo, parte dos retornos mensais foge do intervalo do IQR (especialmente renda variável e exterior,
-mais voláteis). São variações plausíveis e **foram mantidas** (apenas sinalizadas); só valores impossíveis foram rejeitados.
+mais voláteis). São variações plausíveis e **foram mantidas** (apenas sinalizadas); só valores impossíveis foram rejeitados. Na carteira, foram sinalizados 51 outliers na Bronze e 46 na Silver (a redução reflete a remoção de duplicatas e de registros inválidos).
 
-**Dados de mercado (reais):** esperado *nenhum* problema. A evidência da verificação (linhas de `silver.dq_checks` com 0
-problemas) deve aparecer nos screenshots, como pedem as orientações.
+**Dados de mercado (reais):** as verificações de completude, consistência, unicidade e acurácia não encontraram problemas nas tabelas
+`mercado` e `meta_atuarial` (após o ajuste do piso da meta). Restaram apenas 4 outliers estatísticos em `mercado`, compatíveis com eventos reais
+de mercado, como março de 2020 (Ibovespa −29,9% e dólar +15,6%); eles foram mantidos. A evidência está no print 13 (seção 5.3).
 
 ### 5.3 Resultados reais da execução
-> ⚠️ **PREENCHER** – screenshots em `docs/img/` e conferência dos números:
-> 1. Tabela "Problemas detectados" da Bronze (`04_data_quality`, rodado após o `01`);
-> 2. Comparativo Bronze × Silver (rodado após o `03`);
-> 3. Tabela "Evidência de que a verificação foi feita" (inclui as dimensões sem problemas, p.ex. mercado);
-> 4. `silver.carteira_rejeitados` com os motivos.
->
-> Confirme se os números dos screenshots batem com a tabela da seção 5.2; se divergirem (p.ex. se você mudou a semente),
-> **atualize a tabela**.
+
+*Problemas detectados na Bronze (notebook 04, executado após o 01):*
+
+![Problemas detectados na Bronze](docs/img/07_qualidade_bronze.png)
+
+*Comparativo Bronze × Silver (notebook 04, executado após o 03). O `null` na coluna da Silver na regra de data indica que a regra não se aplica: na Silver a coluna já é do tipo DATE.*
+
+![Comparativo Bronze x Silver](docs/img/12_qualidade_comparativo.png)
+
+*Evidência de que a verificação foi feita, inclusive nas dimensões sem problemas (por exemplo, as tabelas de mercado):*
+
+![Evidência das verificações de qualidade](docs/img/13_qualidade_evidencia.png)
+
+*Registros enviados à quarentena na Silver, com o motivo da rejeição:*
+
+![Registros rejeitados na Silver](docs/img/09_silver_rejeitados.png)
 
 ---
 
 ## 6. Análise de Dados (Etapa 4.5)
 
-Consultas e gráficos: [`notebooks/06_analytics.py`](notebooks/06_analytics.py). Para cada pergunta: o que foi feito, o
-resultado (tabela/gráfico) e a discussão.
-
-> **Nota sobre os resultados:** esta seção só pode ser preenchida **depois** de executar o notebook `06` no Databricks.
-> Os números aparecem na última célula ("Números-chave para o README"). Use apenas números que você viu no seu notebook.
-
 ### P1 – A carteira atingiu a meta atuarial?
 * **Como:** `analitico_carteira_mensal` compara o retorno mensal ponderado da carteira com a meta; contagem de meses em que
   `atingiu_meta = true`; retorno acumulado composto (`EXP(SUM(LN(1+r)))−1`) versus meta acumulada, no período e por ano.
-* **Resultado:** ⚠️ **PREENCHER** (screenshot das tabelas e dos 2 gráficos; informar: meses com meta atingida/total,
-  retorno acumulado × meta acumulada, desempenho por ano).
-* **Discussão:** ⚠️ **PREENCHER** – a carteira cumpriu a meta no período? Em quais anos não? Compare o % de meses acima
-  da meta com o resultado acumulado (é possível bater a meta em poucos meses e perder no acumulado, ou o inverso).
+* **Resultado:**
+34 de 72 meses (47,2%). Acumulado: 63,98% contra 86,48% da meta, ou seja, 22,50 p.p. abaixo. Por ano, superou em 2023 (14,14% × 9,85%) e 2025 (13,43% × 9,48%) e ficou abaixo em 2020 (5,94 × 9,74), 2021 (4,54 × 15,56), 2022 (5,42 × 11,07) e 2024 (8,47 × 10,07).
+![Dados P1](docs/img/18a_P1.png)
+![Gráficos P1](docs/img/18b_P1.png)
+* **Discussão:**
+Os resultados indicam que a carteira não atingiu seu principal objetivo de longo prazo, uma vez que superou a meta atuarial em apenas 34 dos 72 meses analisados (47,2%) e acumulou rentabilidade de 63,98%, significativamente inferior aos 86,48% exigidos pela meta. A distância em relação à meta foi maior nos anos de meta elevada, como 2021 (carteira com 4,54% contra meta de 15,56%) e 2022 (5,42% contra 11,07%). Esse resultado sugere que, embora a carteira tenha apresentado ganhos nominais ao longo do período, eles foram insuficientes para acompanhar as exigências atuariais em um horizonte mais amplo.
+
+**Ressalva: carteira sintética; o spread de 5% da meta é premissa do trabalho.**
 
 ### P2 – Qual classe mais contribuiu para o resultado financeiro?
 * **Como:** `analitico_classe_mensal`: soma do resultado financeiro por classe, % do resultado total, posição média e
   retorno acumulado composto.
-* **Resultado:** ⚠️ **PREENCHER** (screenshot da tabela e do gráfico).
-* **Discussão:** ⚠️ **PREENCHER** – distinga *contribuição em R$* (depende do capital alocado) de *eficiência* (retorno %).
+* **Resultado:** 
+Renda Fixa gerou 64,93% do resultado (R$ 877,4 milhões). Em retorno acumulado, a ordem é Exterior (102,08%), Renda Fixa (68,49%), Multimercado (53,42%) e Renda Variável (42,78%).
+![Dados P2](docs/img/19a_P2.png)
+![Gráficos P2](docs/img/19b_P2.png)
+* **Discussão:**
+A análise evidencia a importância de diferenciar contribuição para o resultado financeiro e eficiência dos investimentos. A Renda Fixa foi responsável por 64,93% do resultado total da carteira, gerando aproximadamente R$ 877,4 milhões, o que a torna a principal fonte de retorno em termos absolutos. Entretanto, esse resultado deve ser interpretado à luz do volume de recursos alocados, já que a posição média da classe (cerca de R$ 1,6 bilhão) foi significativamente superior às demais.
 
 ### P3 – Selic × retorno da renda fixa
 * **Como:** correlação de Pearson (`CORR`) entre o retorno mensal da classe Renda Fixa e (a) o nível da Selic,
   (b) o CDI do mês e (c) a variação da Selic; gráficos de dispersão.
-* **Resultado:** ⚠️ **PREENCHER** (coeficientes e *n* de meses; screenshot).
-* **Discussão:** ⚠️ **PREENCHER** – interprete sinal e força. **Obrigatório:** registrar que a carteira é sintética e que o gerador
-  atrela os fundos CDI ao CDI e os fundos indexados à inflação à variação da Selic; portanto a correlação valida a
-  coerência do pipeline, não é evidência sobre fundos reais. Correlação não implica causalidade.
+* **Resultado:**
+72 meses; correlação de 0,56 com o nível da Selic, 0,57 com o CDI e −0,24 com a variação da Selic.
+![Dados P3](docs/img/20a_P3.png)
+![Gráficos P3](docs/img/20b_P3.png)
+* **Discussão:**
+Os resultados indicam que o retorno da renda fixa apresentou correlação positiva moderada tanto com a Selic (0,56) quanto com o CDI (0,57). Isso significa que, em geral, períodos com juros mais elevados estiveram associados a melhores retornos da classe. Entretanto, como os coeficientes estão distantes de 1,0, a relação não é forte nem perfeita, sugerindo que outros fatores além do nível das taxas de juros também influenciam significativamente a rentabilidade dos fundos.
+
+**Ressalva: carteira sintética e o gerador  atrela os fundos CDI ao CDI e os fundos indexados à inflação à variação da Selic; portanto a correlação valida a  coerência do pipeline, não é evidência sobre fundos reais. Correlação não implica causalidade.**
 
 ### P4 – Ibovespa × retorno da renda variável
 * **Como:** correlação, R² e *beta* (`COVAR_SAMP / VAR_SAMP`) entre o retorno da classe Renda Variável e a variação mensal do
   Ibovespa; dispersão com reta de regressão.
-* **Resultado:** ⚠️ **PREENCHER** (correlação, R², beta, *n*; screenshot).
-* **Discussão:** ⚠️ **PREENCHER** – interprete o beta (sensibilidade à bolsa) e mencione o mesmo cuidado sobre dados sintéticos.
+* **Resultado:**
+Correlação 0,9883, R² 0,9768, beta 0,9392.
+![Dados P4](docs/img/21a_P4.png)
+![Gráficos P4](docs/img/21b_P4.png)
+* **Discussão:** 
+Os resultados indicam uma relação extremamente forte entre o desempenho da renda variável e o comportamento do Ibovespa. A correlação de 0,9883 está muito próxima de 1, indicando que as duas variáveis se movimentaram praticamente na mesma direção ao longo de todo o período analisado. Da mesma forma, o R² de 0,9768 sugere que aproximadamente 97,7% da variação observada nos retornos da renda variável pode ser explicada pelas oscilações do índice de mercado utilizado como referência.
+
+O beta de 0,9392 fornece uma interpretação ainda mais relevante para a gestão de investimentos. Esse coeficiente indica que, para cada variação de 1% no Ibovespa, a renda variável da carteira tende a variar cerca de 0,94% na mesma direção. Em termos práticos, a classe apresenta uma sensibilidade muito próxima à do mercado acionário brasileiro, porém ligeiramente inferior. Assim, quando o Ibovespa sobe 10%, a expectativa é que a carteira de renda variável apresente ganho próximo de 9,4%; da mesma forma, quedas do mercado tendem a gerar perdas proporcionalmente semelhantes.
+
+**Ressalva: o ajuste é quase perfeito porque os fundos sintéticos foram construídos com betas de 0,75 a 1,15 sobre o Ibovespa. O que ele valida é a engenharia, não o mercado.**
 
 ### P5 – Cenários em que a meta é superada
 * **Como:** agrupamento de `analitico_carteira_mensal` por `cenario_economico` (juros × bolsa): nº de meses, retorno médio,
   excesso médio sobre a meta e % de meses com meta atingida; também por regime de juros e de bolsa isoladamente.
-* **Resultado:** ⚠️ **PREENCHER** (tabelas e gráfico; sempre informando o *n* de cada cenário).
-* **Discussão:** ⚠️ **PREENCHER** – compare cenários; **não tire conclusões de cenários com poucos meses**.
+* **Resultado:**
+Meta atingida em 75,6% dos meses de bolsa em alta (n=41) contra 9,7% nos de bolsa em queda (n=31). Por juros: 66,7% com Selic em queda (n=12), 53,7% estável (n=41), 21,1% em alta (n=19). O cenário Selic em queda/bolsa em alta tem 100% mas só n=6.
+![Dados P5a](docs/img/22a_P5.png)
+![Dados P5b](docs/img/22b_P5.png)
+![Gráficos P5](docs/img/22c_P5.png)
+* **Discussão:** 
+A análise dos cenários demonstra que o comportamento do mercado acionário foi o fator mais relevante para o atingimento da meta atuarial. Nos meses em que a bolsa esteve em alta (n = 41), a carteira superou a meta em 75,6% das observações, enquanto nos períodos de bolsa em queda (n = 31) esse percentual caiu para apenas 9,7%. Essa diferença expressiva sugere que os ativos de risco tiveram papel importante na geração de retorno suficiente para compensar as exigências atuariais.
+
+Ao analisar isoladamente o comportamento dos juros, observa-se que a carteira apresentou melhor desempenho em ambientes de queda da Selic, nos quais a meta foi atingida em 66,7% dos meses (n = 12). Em cenários de juros estáveis (n = 41), a taxa de sucesso foi de 53,7%, enquanto em períodos de elevação da Selic (n = 19) caiu para 21,1%. Esse resultado é consistente com a interpretação apresentada na análise da renda fixa: embora juros elevados possam beneficiar parte dos investimentos, ciclos de alta costumam gerar ajustes de mercado e elevar a dificuldade de superação da meta atuarial.
+
+Quando os fatores são analisados conjuntamente, observa-se que o cenário de Selic em queda e bolsa em alta apresentou a maior taxa de sucesso, com atingimento da meta em 100% dos meses observados. Entretanto, esse resultado deve ser interpretado com cautela, pois a amostra é reduzida (n = 6). Com um número tão pequeno de observações, não é possível afirmar que esse comportamento se repetiria de forma consistente em períodos mais longos.
+
+Outro resultado interessante é o cenário de Selic em alta e bolsa em alta, no qual a meta foi atingida em apenas 33,3% dos meses (n = 12). Isso sugere que a valorização da bolsa, embora importante, não foi suficiente para garantir o atingimento da meta quando acompanhada por um ambiente de aperto monetário. Em outras palavras, uma bolsa favorável aumenta significativamente as chances de sucesso, mas não elimina os impactos negativos decorrentes da elevação dos juros e do aumento da exigência atuarial.
+
+De forma geral, os resultados indicam que a direção do mercado acionário parece exercer maior influência sobre o atingimento da meta do que o comportamento isolado da Selic. Contudo, a análise mostra também que o melhor desempenho ocorre quando ambos os fatores atuam de forma favorável, ou seja, em ambientes de valorização da bolsa e redução dos juros. Como alguns cenários possuem quantidade limitada de observações, as conclusões devem ser interpretadas como indicativas e não definitivas, reforçando a importância de considerar o tamanho da amostra (n) antes de extrapolar resultados para decisões de investimento.
+
+**Ressalva: juros altos e inflação alta coincidem no tempo, então os efeitos se misturam; cenários com n=6 ou 7 não sustentam conclusões.**
 
 ### Discussão geral
-⚠️ **PREENCHER** – conecte as respostas ao problema original: a área de investimentos consegue, com este pipeline, saber se
-bate a meta, o que sustenta o resultado e como o mercado afeta a carteira? Quais ações a análise sugeriria?
+O pipeline desenvolvido demonstrou ser capaz de consolidar, tratar e disponibilizar informações de investimentos e mercado em uma estrutura organizada, baseada na arquitetura Medalhão (Bronze, Silver e Gold). A utilização de camadas de tratamento, validações de qualidade e modelagem dimensional permitiu a construção de uma base consistente para análise, garantindo rastreabilidade dos dados e fornecendo informações capazes de responder às cinco perguntas de negócio definidas no início do projeto. Dos 870 registros brutos da carteira, 857 foram aproveitados após a remoção de 6 duplicatas e a quarentena de 7 registros inválidos, todos rastreáveis em silver.carteira_rejeitados. Dessa forma, a área de investimentos passa a dispor de um processo estruturado para acompanhar o atingimento da meta atuarial, identificar os principais responsáveis pelo desempenho da carteira e avaliar a influência das condições de mercado sobre os resultados obtidos.
+
+As análises indicaram que a carteira não atingiu seu objetivo principal no período avaliado, acumulando retorno de 63,98% frente a uma meta atuarial acumulada de 86,48%, além de superar a meta em apenas 34 dos 72 meses analisados (47,2%). Observou-se também que a Renda Fixa foi a principal responsável pelo resultado financeiro em termos absolutos, respondendo por 64,93% dos ganhos acumulados, reflexo da elevada parcela do patrimônio investida nessa classe. Em contrapartida, os investimentos no Exterior apresentaram a maior eficiência em termos de retorno acumulado percentual. A maior eficiência do Exterior decorre da premissa do gerador (dólar mais retorno externo aleatório). A análise dos fatores de mercado mostrou ainda que a renda fixa possui relação positiva moderada com os níveis de Selic e CDI, enquanto a renda variável apresentou forte aderência ao comportamento do Ibovespa. Por fim, os cenários de bolsa em alta mostraram-se mais favoráveis ao atingimento da meta atuarial, sugerindo que o comportamento do mercado acionário teve papel relevante para o desempenho consolidado da carteira (relações construídas pelo gerador de dados sintéticos; ver ressalvas em P3 e P4).
+
+A partir desses resultados, algumas investigações adicionais poderiam ser conduzidas em etapas futuras. Uma primeira linha de aprofundamento seria avaliar se a alocação entre as classes de ativos está adequada ao objetivo de superar a meta atuarial de longo prazo, especialmente considerando a diferença observada entre contribuição financeira e eficiência dos investimentos. Também seria interessante analisar métricas de risco, como volatilidade, drawdown e retorno ajustado ao risco, para verificar se as classes mais rentáveis mantiveram desempenho consistente ao longo do tempo. Além disso, poderiam ser incorporados modelos de atribuição de performance, análise por gestor e simulações de rebalanceamento da carteira. Essas avaliações complementares permitiriam compreender não apenas se a meta foi atingida, mas principalmente quais decisões de alocação têm maior potencial para aumentar a probabilidade de atingimento das metas previdenciárias futuras.
 
 ### Limitações
-* Carteira sintética (relações construídas pelo gerador); *spread* de 5,0% a.a. da meta é premissa didática.
-* 6 anos de dados mensais (72 pontos) e poucos fundos: correlações com intervalo de confiança amplo.
-* Retorno de cada fundo/mês é tomado como informado; não há fluxos intramês, custos ou tributação.
+Os resultados devem ser interpretados considerando que a carteira analisada foi construída com dados sintéticos gerados para fins acadêmicos. As premissas utilizadas incluem um spread atuarial fixo de 5%, um horizonte de 72 meses e uma carteira composta por 12 fundos simulados. Além disso, não foram considerados custos operacionais, taxas de administração, tributação ou restrições regulatórias específicas que normalmente afetam o desempenho de carteiras reais. Portanto, os resultados permitem validar a arquitetura e o processo analítico propostos, mas não devem ser interpretados como representação do desempenho efetivo de uma carteira real de investimentos.
 
 ---
 
 ## 7. Autoavaliação
 
-> ⚠️ **PREENCHER SOMENTE DEPOIS de concluir o trabalho.** As orientações pedem uma discussão honesta sobre o que foi
-> atingido ou não, as dificuldades encontradas e trabalhos futuros. O não atingimento de objetivos não reduz a nota.
-
-**7.1 Objetivos atingidos** – preencha a tabela com a sua avaliação real:
-
-| Pergunta | Respondida? (sim / parcialmente / não) | Comentário |
+### 7.1 Objetivos atingidos
+| Pergunta | Respondida? | Comentário |
 |---|---|---|
-| P1 | ⚠️ | ⚠️ |
-| P2 | ⚠️ | ⚠️ |
-| P3 | ⚠️ | ⚠️ |
-| P4 | ⚠️ | ⚠️ |
-| P5 | ⚠️ | ⚠️ |
+| P1 – Meta atuarial | Sim | A carteira não atingiu a meta: 34 de 72 meses (47,2%) e 63,98% acumulado contra 86,48%. |
+| P2 – Contribuição por classe | Sim | Renda Fixa lidera em R$ (64,93%); o Exterior lidera em retorno acumulado (102,08%). |
+| P3 – Selic × renda fixa | Sim, com ressalva | Correlação moderada (0,56 com a Selic; 0,57 com o CDI); relação construída pelo gerador, não evidência sobre fundos reais. |
+| P4 – Ibovespa × renda variável | Sim, com ressalva | Correlação de 0,99 e beta de 0,94, também decorrentes do gerador. |
+| P5 – Cenários | Sim, com cautela | Bolsa em alta: meta atingida em 75,6% dos meses (n=41), contra 9,7% na bolsa em queda (n=31); cenários combinados têm poucos meses (n de 6 a 23). |
 
-**7.2 Dificuldades encontradas** – ⚠️ **PREENCHER** com o que realmente aconteceu (ex.: criação do catálogo na Free Edition,
-upload no Volume, ajustes de tipos/datas, séries do Banco Central, interpretação das análises).
+Considero que o objetivo principal do MVP foi atingido: construir um pipeline completo, documentado e reproduzível
+(coleta, Bronze, Silver, Gold, qualidade, catálogo e análise) capaz de responder todas as perguntas definidas.
+O que não foi possível é tirar conclusões sobre fundos reais, porque a carteira é sintética.
 
-**7.3 Limitações do trabalho** – ⚠️ **PREENCHER** com as suas palavras (ponto de partida: seção 6, "Limitações").
+### 7.2 Dificuldades encontradas
+* **Fonte do Ibovespa.** A série 7 do SGS (Banco Central) retornou dados só até 2019 e o script falhou para 2020.
+  Troquei a fonte pelo Yahoo Finance (biblioteca `yfinance`) e tive de revisar a seção de licenças e termos de uso.
+* **Regra de qualidade mal calibrada.** A primeira regra de acurácia exigia meta atuarial entre 0 e 5% a.m. A verificação
+  sinalizou julho de 2022 (IPCA de −0,68% e meta de −0,2754%). O problema estava na minha regra, não no dado: a meta pode
+  ser negativa em mês de deflação. Ajustei o piso para −2% e mantive os 72 meses.
+* **Ambiente.** O instalador novo do Python exibiu mensagens que pareciam erros, mas eram configurações opcionais, e a
+  interface do Databricks era diferente do tutorial (o seletor *Serverless* no lugar do botão *Connect*).
+  Também demorei a entender que as imagens e o README ficam no GitHub, enquanto o Databricks só executa os notebooks.
+* **Leitura dos resultados.** Precisei distinguir erro de dado de outlier legítimo (os 46 outliers da Silver foram
+  mantidos e sinalizados), contribuição em R$ de eficiência (retorno %), e conclusão de cenário com n pequeno.
 
-**7.4 Trabalhos futuros** (ideias para adaptar ao seu portfólio): substituir a carteira sintética por dados reais públicos de
-fundos (informes diários da CVM); orquestrar o pipeline com Databricks Workflows/Jobs e carga incremental; testes de qualidade
-automatizados e falhando o pipeline em caso de violação; dashboard sobre as tabelas Gold; análise de sensibilidade da meta
-variando o *spread*.
+### 7.3 Aprendizados e limitações
+O principal aprendizado foi o raciocínio de ponta a ponta: cada etapa depende das decisões da anterior, e as verificações
+de qualidade detectam problemas que a análise final esconderia. As limitações são as descritas na seção 6 (carteira
+sintética, spread de 5% como premissa, 72 meses e 12 fundos, sem custos ou tributação).
+
+### 7.4 Trabalhos futuros
+* Substituir a carteira sintética por dados reais públicos de fundos (informes diários da CVM).
+* Orquestrar o pipeline com Databricks Workflows e carga incremental mensal.
+* Transformar as verificações de qualidade em testes automáticos que interrompam o pipeline em caso de violação.
+* Criar um painel sobre as tabelas Gold e métricas de risco (volatilidade, drawdown, retorno ajustado ao risco).
+* Analisar a sensibilidade da meta atuarial a diferentes valores de spread.
+
+### 7.5 Uso de ferramentas de IA
+Utilizei IA como apoio para estruturar o pipeline e tirar dúvidas; executei e validei o código no Databricks, e redigi as análises e discussões também com o apoio de IA, para dar mais corpo ao trabalho.
 
 ---
 
@@ -622,7 +709,7 @@ mvp_meta_atuarial/
 ├── README.md                      <- este documento (relatório do MVP)
 ├── requirements.txt
 ├── scripts/
-│   ├── 01_baixar_dados_bcb.py     <- coleta dos indicadores reais (API SGS/BCB)
+│   ├── 01_baixar_dados_bcb.py     <- coleta dos indicadores reais (API SGS/BCB e Yahoo Finance)
 │   └── 02_gerar_carteira_sintetica.py
 ├── notebooks/                     <- notebooks Databricks (formato-fonte .py)
 │   ├── config.py   catalogo.py
